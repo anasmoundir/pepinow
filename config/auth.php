@@ -1,6 +1,13 @@
 <?php
 
 return [
+    
+    'jwt' => [
+        'secret' => env('JWT_SECRET'),
+        'ttl' => env('JWT_TTL', 60),
+        
+    ],
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -14,7 +21,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -36,11 +43,12 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
+        'api' => [
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------
