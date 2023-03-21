@@ -18,3 +18,4 @@ Route::middleware('jwt.auth')->get('/user', function (Request $request) {
 });
 Route::post('/login', 'App\Http\Controllers\AuthController@login');
 Route::post('/register', 'App\Http\Controllers\AuthController@register');
+Route:: resource('categories', 'App\Http\Controllers\CategoriesController');
