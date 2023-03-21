@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Categorie extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+    ];
     public function plants()
     {
         return $this->belongsToMany(Product::class, 'categorie_plant');

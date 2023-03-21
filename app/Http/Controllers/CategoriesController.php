@@ -4,9 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CategoriesController extends Controller
 {
+
+    protected function sendError($message, $errors = null)
+{
+    $response = [
+        'status' => 'error',
+        'message' => $message,
+    ];
+    if (!is_null($errors)) {
+        $response['errors'] = $errors;
+    }
+    return response()->json($response, 422);
+}
     /**
      * Display a listing of the resource.
      */
@@ -35,19 +48,15 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
-        //
         $input = $request->all();
-        $validator = validator ::make(
-            [
-                'name' =>'required',
-            ]
-        );
-        if($validator ->fails())
-        {
+        $validator = Validator::make($input, [
+            'name' => 'required',
+        ]);
+        if ($validator->fails()) {
             return $this->sendError('error validation', $validator->errors());
         }
         $categorie = Categorie::create($input);
-        return response() ->json([
+        return response()->json([
             'status' => 200,
             'message' => 'success',
             'data' => $categorie
@@ -57,15 +66,13 @@ class CategoriesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Categorie $categorie)
+    public function show($id)
     {
-        //
         $categorie = Categorie::find($id);
-        if(is_null)
-        {
-            return $this ->sendError('categorie not found');
+        if (is_null($categorie)) {
+            return $this->sendError('categorie not found');
         }
-        return response() ->json([
+        return response()->json([
             'status' => 200,
             'message' => 'success',
             'data' => $categorie
@@ -83,33 +90,50 @@ class CategoriesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Categorie $categorie)
-    {
-        //
-        $input =$request->all();
-        validator::make(
-            [
-                'name' => 'required',
-            ]
-        );
-        if(validator->fails())
-        {
-            return $this->sendError('error validation', $validator->errors());
-        }
-        $categorie->name = $input['name'];
-        return response() ->json([
-            'status' => 200,
-            'message' => 'success',
-            'data' => $categorie
-        ]);
+    public function update(Request $request, $id)
+{
+    // find the category by ID
+    $categorie = Categorie::find($id);
+    
+    // check if category exists
+    if (!$categorie) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'category not found',
+        ], 404);
     }
-
+    
+    // validate the request data
+    $validator = Validator::make($request->all(), [
+        'name' => 'required',
+    ]);
+    
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'validation error',
+            'errors' => $validator->errors(),
+        ], 422);
+    }
+    
+    // update the category
+    $categorie->update([
+        'name' => $request->input('name'),
+    ]);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => 'category updated successfully',
+        'data' => $categorie,
+    ]);
+}
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Categorie $categorie)
+    public function destroy($id)
     {
         //
+        $categorie = Categorie::find($id);
         $categorie  ->delete();
         return response() ->json([
             'status' => 200,
