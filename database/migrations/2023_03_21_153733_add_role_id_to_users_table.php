@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categorie_plant', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('categorie_id')->ondelete('cascade');
-            $table->foreignId('plant_id')->ondelete('cascade');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            //
+          
+                $table->string('roles')->nullable();
+        
         });
     }
 
@@ -24,6 +24,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pivot_table_categorie_plant');
+        Schema::table('users', function (Blueprint $table) {
+            //
+        });
     }
 };

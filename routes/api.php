@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,9 +12,14 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::middleware('jwt.auth')->get('/user', function (Request $request) {
-    return $request->user();
+// Define routes that require authentication with JWT
+Route::group(['middleware' => 'jwt.auth'], function () {
+    Route::resource('categories', 'App\Http\Controllers\CategoriesController');
+    Route::resource('plants', 'App\Http\Controllers\PlantsController');
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
+
 Route::post('/login', 'App\Http\Controllers\AuthController@login');
 Route::post('/register', 'App\Http\Controllers\AuthController@register');
-Route:: resource('categories', 'App\Http\Controllers\CategoriesController');

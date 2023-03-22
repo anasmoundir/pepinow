@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Plant extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'image',
+    ];
     public function categories()
     {
         return $this->belongsToMany(Categorie::class, 'categorie_plant');
