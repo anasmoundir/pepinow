@@ -11,7 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -54,4 +54,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    //set the relationship between user and role 
+
 }
