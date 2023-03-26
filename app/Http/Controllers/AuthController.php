@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware(['auth:api', 'role_or_permission:admin|seller'])->except(['login', 'register']);
     }
     //
     public function login(Request $request)
@@ -72,6 +72,7 @@ class AuthController extends Controller
     return response()->json(['message' => 'Password reset link sent to your email']);
     }
 
+    
   
 
 public function resetPassword(Request $request, $token)
@@ -109,18 +110,4 @@ public function resetPassword(Request $request, $token)
     return response()->json(['message' => 'Password reset successful']);
 }
 
-    public function approveSeller(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-
-        // Check if the user is a seller
-        if (! $user->hasRole('seller')) {
-            return response()->json(['error' => 'User is not a seller'], 401);
-        }
-        $user->approved = true;
-
-        $user->save();
-
-        return response()->json(['user' => $user]);
-    }
 }

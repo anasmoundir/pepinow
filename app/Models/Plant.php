@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 class Plant extends Model
 {
     use HasFactory;
+   
+    protected $table = 'plants';
     protected $fillable = [
-        'name',
+        'nom',
         'description',
-        'price',
+        'prix',
         'image',
     ];
     public function categories()

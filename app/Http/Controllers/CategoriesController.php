@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Spatie\Permission\Models\Role;
+
 
 
 
@@ -31,13 +31,23 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        //
-         $categorie = Categorie::all();
-        return response() ->json([
-            'status' => 200,
-            'message' => 'success',
-            'data' => $categorie
-        ]);
+       $user = auth()->user();
+        $role = $user->getRoleNames()[0];
+        if($role == 'admin' )
+        {   
+            $categorie = Categorie::all();
+            return response()->json([
+                'status' => 200,
+                'message' => 'success',
+                'data' => $categorie
+            ]);
+        }
+        else {
+            return response()->json([
+                'status' => 403,
+                'message' => 'forbidden',
+            ]);
+        }
     }
 
     /**
@@ -54,9 +64,14 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+        $role = $user->getRoleNames()[0];
+
+        if ($role == 'admin') {
         $input = $request->all();
+    
         $validator = Validator::make($input, [
-            'name' => 'required',
+            'nom' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->sendError('error validation', $validator->errors());
@@ -68,21 +83,38 @@ class CategoriesController extends Controller
             'data' => $categorie
         ]);
     }
-
+    else {
+        return response()->json([
+            'status' => 403,
+            'message' => 'forbidden',
+        ]);
+    }
+}
     /**
      * Display the specified resource.
      */
     public function show($id)
     {
-        $categorie = Categorie::find($id);
-        if (is_null($categorie)) {
-            return $this->sendError('categorie not found');
+        $user = auth()->user();
+        $role = $user->getRoleNames()[0];
+        if($role == 'admin' )
+        {
+            $categorie = Categorie::find($id);
+            if (is_null($categorie)) {
+                return $this->sendError('categorie not found');
+            }
+            return response()->json([
+                'status' => 200,
+                'message' => 'success',
+                'data' => $categorie
+            ]);        
         }
-        return response()->json([
-            'status' => 200,
-            'message' => 'success',
-            'data' => $categorie
-        ]);        
+        else {
+            return response()->json([
+                'status' => 403,
+                'message' => 'forbidden',
+            ]);
+        }        
     }
 
     /**
@@ -99,6 +131,10 @@ class CategoriesController extends Controller
     public function update(Request $request, $id)
 {
     // find the category by ID
+    $use = auth()->user();
+    $role = $user->getRoleNames()[0];
+    echo $role;
+    if ($role == 'admin') {
     $categorie = Categorie::find($id);
     
     // check if category exists
@@ -131,20 +167,31 @@ class CategoriesController extends Controller
         'status' => 'success',
         'message' => 'category updated successfully',
         'data' => $categorie,
-    ]);
+    ]); 
+}
+    else {
+        return response()->json([
+            'status' => 403,
+            'message' => 'forbidden',
+        ]);
+    }
 }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
-        //
+        if ($role == 'admin') {
         $categorie = Categorie::find($id);
         $categorie  ->delete();
         return response() ->json([
             'status' => 200,
             'message' => 'deleted succefuly',
             'data' => $categorie
-        ]);
+        ]);}else{
+            return response()->json([
+                'status' => 403,
+                'message' => 'forbidden',
+            ]);}
     }
 }

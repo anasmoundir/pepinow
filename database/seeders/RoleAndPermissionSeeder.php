@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -14,11 +15,11 @@ class RoleAndPermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        // Clear cached permissions
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create permissions
-        Permission::create(['name' => 'create_account']);
+        Permission::create(['name' => 'register']);
         Permission::create(['name' => 'login']);
         Permission::create(['name' => 'reset_password']);
         Permission::create(['name' => 'edit_account']);
@@ -33,15 +34,13 @@ class RoleAndPermissionSeeder extends Seeder
 
         // Create roles and assign permissions
         $adminRole = Role::create(['name' => 'admin']);
-        $adminRole->givePermissionTo(permission::all());
+        $adminRole->givePermissionTo(Permission::all());
 
         $sellerRole = Role::create(['name' => 'seller']);
         $sellerRole->givePermissionTo(['create_plant', 'edit_plant', 'delete_plant']);
 
         $customerRole = Role::create(['name' => 'customer']);
-        $customerRole->givePermissionTo(['view_plants', 'create_account', 'login', 'reset_password', 'edit_account']);
-
-           
+        $customerRole->givePermissionTo(['view_plants', 'register', 'login', 'reset_password', 'edit_account']);
         
     }
 }

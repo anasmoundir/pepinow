@@ -47,6 +47,17 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
+        'seller' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+            'hash' => false,
+        ],
+    
+        'admin' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+            'hash' => false,
+        ],
     ],
 
 

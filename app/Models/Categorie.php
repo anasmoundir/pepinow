@@ -10,10 +10,10 @@ class Categorie extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name',
+        'nom',
     ];
     public function plants()
     {
-        return $this->belongsToMany(Product::class, 'categorie_plant');
+        return $this->belongsToMany(Plant::class, 'categorie_plant');
     }
 }

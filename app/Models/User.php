@@ -12,12 +12,13 @@ use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles ;
 
-    public function hasRole($roles, $guard = null)
+    public function getRoleNames()
     {
-        return $this->hasAnyRole($roles, $guard);
+        return $this->roles()->pluck('name');
     }
+  
     /**
      * The attributes that are mass assignable.use Tymon\JWTAuth\Contracts\JWTSubject;
      *
