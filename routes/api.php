@@ -12,9 +12,7 @@ Route::post('/forgot-password', 'App\Http\Controllers\AuthController@forgotPassw
 Route::post('/reset-password/{token}', 'App\Http\Controllers\AuthController@resetPassword');
 
 
-   
-Route::post('makeSeller/{id}', 'App\Http\Controllers\manageAccounts@makeSeller');
-Route::post('makeAdmin', 'App\Http\Controllers\manageAccounts@makeAdmin');
+
 
 // Routes that require authentication
 Route::group(['middleware' => 'jwt.auth'], function () {
@@ -22,7 +20,9 @@ Route::group(['middleware' => 'jwt.auth'], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    
+       
+    Route::post('makeSeller/{id}', 'App\Http\Controllers\manageAccounts@makeSeller');
+    Route::post('makeAdmin/{id}', 'App\Http\Controllers\manageAccounts@makeAdmin');
     Route::post('/logout', 'App\Http\Controllers\AuthController@logout');
     Route::post('/password/reset', 'App\Http\Controllers\AuthController@resetPassword');
     Route::post('/password/email', 'App\Http\Controllers\AuthController@sendResetLinkEmail');
