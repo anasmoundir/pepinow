@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth:api', 'role_or_permission:admin|seller'])->except(['login', 'register']);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword']]);
     }
     //
     public function login(Request $request)
@@ -41,7 +41,7 @@ class AuthController extends Controller
 
         return response()->json(['user' => $user,]);
     }
-    public function forgotPassword(Request $request)
+public function forgotPassword(Request $request)
 {
     // Validate the request data
     $validator = Validator::make($request->all(), [
@@ -103,11 +103,35 @@ public function resetPassword(Request $request, $token)
     // Update the user's password
     $user->password = Hash::make($request->password);
     $user->save();
-
     // Delete the password reset request
     $passwordReset->delete();
-
     return response()->json(['message' => 'Password reset successful']);
 }
+public function updateProfile(Request $request)
+{
+    // Get the authenticated user
+    $user = auth()->user();
 
+    // Validate the request data
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email,' . $user->id,
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 400);
+    }
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->save();
+    return response()->json(['user' => $user]);
+}
+public function logout(Request $request)
+{
+    echo "logout";
+
+
+   
+}
 }

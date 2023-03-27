@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Plant;
+use App\Models\Categorie;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -28,40 +29,42 @@ class PlantsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    $user = auth()->user();
-    $role = $user->getRoleNames()[0];
-
-    if ($role == 'admin' || $role == 'seller') {
-        
-        $validatedData = $request->validate([
-            'nom' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'prix' => 'required|numeric',
-            'image' => 'nullable|image|max:2048',
+    {
+        $user = auth()->user();
+        $role = $user->getRoleNames()[0];
+    
+        if ($role == 'admin' || $role == 'seller') {
             
-        ]);
-
-        $plant = new Plant();
-        $plant->nom = $validatedData['nom'];
-        $plant->description = $validatedData['description'];
-        $plant->prix = $validatedData['prix'];
-   
-
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images'), $imageName);
-            $plant->image = $imageName;
+            $validatedData = $request->validate([
+                'nom' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'prix' => 'required|numeric',
+                'image' => 'nullable|image|max:2048',
+                'categorie_id' => 'required|integer|exists:categories,id'
+            ]);
+    
+            $plant = new Plant();
+            $plant->nom = $validatedData['nom'];
+            $plant->description = $validatedData['description'];
+            $plant->prix = $validatedData['prix'];
+       
+    
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('images'), $imageName);
+                $plant->image = $imageName;
+            }
+    
+            $plant->save();
+    
+            $plant->categories()->attach($validatedData['categorie_id']);
+    
+            return response()->json(['plant' => $plant], 201);
+        } else {
+            return response()->json(['error' => 'you dont have the permission'], 403);
         }
-
-        $plant->save();
-
-        return response()->json(['plant' => $plant], 201);
-    } else {
-        return response()->json(['error' => 'you dont have the permission'], 403);
     }
-}
 
     /**
      * Display the specified resource.
@@ -141,5 +144,20 @@ class PlantsController extends Controller
 
         return response()->json(['message' => 'Plant deleted']);
     }
+    public function getPlantsByCategory(Request $request, $id)
+{
+    $category = Categorie::find($id);
+    echo $category;
+    if (!$category) {
+        return response()->json(['error' => 'Category not found'], 404);
+    }
+
+    $plants = $category->plants;
+    if ($plants->isEmpty()) {
+        return response()->json(['error' => 'No plants found in this category'], 404);
+    }
+
+    return response()->json(['plants' => $plants], 200);
+}
 
 }
